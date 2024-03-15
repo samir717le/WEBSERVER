@@ -1,0 +1,171 @@
+#!/bin/bash
+
+# Function to start MySQL
+start_mysql() {
+    sudo systemctl start mysql
+}
+
+# Function to stop MySQL
+stop_mysql() {
+    sudo systemctl stop mysql
+}
+
+# Function to restart MySQL
+restart_mysql() {
+    sudo systemctl restart mysql
+}
+
+# Function to start Nginx
+start_nginx() {
+    sudo systemctl start nginx
+}
+
+# Function to stop Nginx
+stop_nginx() {
+    sudo systemctl stop nginx
+}
+
+# Function to restart Nginx
+restart_nginx() {
+    sudo systemctl restart nginx
+}
+
+# Function to start PHPMyAdmin (assumed to be running on a web server)
+start_phpmyadmin() {
+    # Start your web server (Apache or Nginx)
+    # Example for Nginx:
+    sudo systemctl start nginx
+}
+
+# Function to stop PHPMyAdmin (assumed to be running on a web server)
+stop_phpmyadmin() {
+    # Stop your web server (Apache or Nginx)
+    # Example for Nginx:
+    sudo systemctl stop nginx
+}
+
+# Function to restart PHPMyAdmin (assumed to be running on a web server)
+restart_phpmyadmin() {
+    # Restart your web server (Apache or Nginx)
+    # Example for Nginx:
+    sudo systemctl restart nginx
+}
+
+# Main script
+case "$1" in
+    start)
+        start_mysql
+        start_nginx
+        start_phpmyadmin
+        ;;
+    stop)
+        stop_mysql
+        stop_nginx
+        stop_phpmyadmin
+        ;;
+    restart)
+        restart_mysql
+        restart_nginx
+        restart_phpmyadmin
+        ;;
+    help)
+        echo "To Start: webserver start"
+       echo "To Stop: webserver stop"
+       echo "To Restart: webserver restart"
+        ;;
+esac
+
+exit 0
+# Function to install dialog if not already installed
+install_dialog() {
+    if ! [ -x "$(command -v dialog)" ]; then
+        echo "Installing dialog..."
+        if [ -x "$(command -v apt-get)" ]; then
+            sudo apt-get update && sudo apt-get install -y dialog
+        elif [ -x "$(command -v brew)" ]; then
+            brew install dialog
+        else
+            echo "Error: Unsupported package manager. Please install dialog manually."
+            exit 1
+        fi
+    fi
+}
+
+# Function to start the server
+start_server() {
+    echo "Starting server..."
+    start_mysql
+        start_nginx
+        start_phpmyadmin
+}
+
+# Function to stop the server
+stop_server() {
+    echo "Stopping server..."
+    stop_mysql
+        stop_nginx
+        stop_phpmyadmin
+}
+
+# Function to restart the server
+restart_server() {
+    stop_server
+    start_server
+}
+
+# Function to reinstall the server
+reinstall_server() {
+    echo "Reinstalling server..."
+    # Add your server reinstall command here
+}
+
+# Function to configure the server
+configure_server() {
+    clear
+    echo "Configuring server..."
+    # Add your server configuration steps here
+}
+
+# Main menu
+main_menu() {
+    clear
+    echo "Server Management"
+    echo "Choose an action:"
+    echo "1. Start Server"
+    echo "2. Stop Server"
+    echo "3. Restart Server"
+    echo "4. Reinstall Server"
+    echo "5. Configure Server"
+    echo "6. Exit"
+
+    # Dialog menu
+    dialog --clear --backtitle "Server Management" --menu "Choose an action:" 0 0 0 \
+    1 "Start Server" \
+    2 "Stop Server" \
+    3 "Restart Server" \
+    4 "Reinstall Server" \
+    5 "Configure Server" \
+    6 "Exit" \
+    2> /tmp/menu_choice.txt
+    choice=$(cat /tmp/menu_choice.txt)
+    handle_choice $choice
+}
+
+# Function to handle user's choice
+handle_choice() {
+    case $1 in
+        1) start_server;;
+        2) stop_server;;
+        3) restart_server;;
+        4) reinstall_server;;
+        5) configure_server;;
+        6) echo "Exiting."; exit;;
+        *) echo "Invalid choice. Exiting."; exit 1;;
+    esac
+}
+
+# Check and install dialog if needed
+install_dialog
+
+# Display the main menu
+main_menu

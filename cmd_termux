@@ -1,0 +1,164 @@
+#!/bin/bash
+# Function to start services in Termux
+start_termux_services() {
+    echo "Starting services in Termux..."
+    termux-services restart nginx
+    termux-services restart mariadb
+}
+
+# Function to start MySQL
+start_mysql() {
+    # Assuming MySQL is installed and can be started using the 'mysqld' command
+    mysqld_safe &
+}
+
+# Function to stop MySQL
+stop_mysql() {
+    # Assuming MySQL is installed and can be stopped using the 'mysqladmin' command
+    mysqladmin shutdown
+}
+
+# Function to restart MySQL
+restart_mysql() {
+    stop_mysql
+    start_mysql
+}
+
+# Function to start Nginx
+start_nginx() {
+    # Assuming Nginx is installed and can be started using the 'nginx' command
+    nginx
+}
+
+# Function to stop Nginx
+stop_nginx() {
+    # Assuming Nginx is installed and can be stopped using the 'nginx -s stop' command
+    nginx -s stop
+}
+
+# Function to restart Nginx
+restart_nginx() {
+    # Assuming Nginx is installed and can be restarted using the 'nginx -s reload' command
+    nginx -s reload
+}
+
+# Function to start PHPMyAdmin (assumed to be running on a web server)
+start_phpmyadmin() {
+    # Start your web server (Apache or Nginx)
+    # Example for Nginx:
+    nginx
+}
+
+# Function to stop PHPMyAdmin (assumed to be running on a web server)
+stop_phpmyadmin() {
+    # Stop your web server (Apache or Nginx)
+    # Example for Nginx:
+    nginx -s stop
+}
+
+# Function to restart PHPMyAdmin (assumed to be running on a web server)
+restart_phpmyadmin() {
+    # Restart your web server (Apache or Nginx)
+    # Example for Nginx:
+    nginx -s reload
+}
+
+# Main script
+case "$1" in
+    start)
+        start_mysql
+        start_nginx
+        start_phpmyadmin
+        start_termux_services
+        ;;
+    stop)
+        stop_mysql
+        stop_nginx
+        stop_phpmyadmin
+        ;;
+    restart)
+        restart_mysql
+        restart_nginx
+        restart_phpmyadmin
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0
+
+# Function to install dialog if not already installed
+install_dialog() {
+    if ! [ -x "$(command -v dialog)" ]; then
+        echo "Installing dialog..."
+        pkg install -y dialog
+    fi
+}
+
+# Function to start the server
+start_server() {
+    echo "Starting server..."
+    start_mysql
+    start_nginx
+    start_phpmyadmin
+    start_termux_services
+}
+
+# Function to stop the server
+stop_server() {
+    echo "Stopping server..."
+    stop_mysql
+    stop_nginx
+    stop_phpmyadmin
+}
+
+# Function to restart the server
+restart_server() {
+    stop_server
+    start_server
+}
+
+# Function to reinstall the server
+reinstall_server() {
+    echo "Reinstalling server..."
+    # Add your server reinstall command here
+}
+
+# Function to configure the server
+configure_server() {
+    clear
+    echo "Configuring server..."
+    # Add your server configuration steps here
+}
+
+# Main menu
+main_menu() {
+    install_dialog
+    while true; do
+        choice=$(dialog --clear --backtitle "Server Management" \
+            --title "Main Menu" \
+            --menu "Choose an action:" 15 40 6 \
+            1 "Start Server" \
+            2 "Stop Server" \
+            3 "Restart Server" \
+            4 "Reinstall Server" \
+            5 "Configure Server" \
+            6 "Exit" \
+            2>&1 >/dev/tty)
+
+        case $choice in
+            1) start_server;;
+            2) stop_server;;
+            3) restart_server;;
+            4) reinstall_server;;
+            5) configure_server;;
+            6) echo "Exiting."; exit;;
+            *) echo "Invalid choice. Please try again.";;
+        esac
+    done
+}
+
+# Display the main menu
+main_menu
